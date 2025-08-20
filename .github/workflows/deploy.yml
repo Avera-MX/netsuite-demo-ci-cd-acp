@@ -1,0 +1,183 @@
+name: NetSuite CI/CD
+
+on:
+  push:
+    branches: ["production", "sandbox"]
+    paths:
+      - src/**
+  workflow_dispatch:
+concurrency:
+  group: netsuite-ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+          cache: "npm"
+
+      - name: Cache SuiteCloud CLI
+        id: cache-suitecloud
+        uses: actions/cache@v4
+        with:
+          path: /opt/hostedtoolcache/node/16.20.2/x64/lib/node_modules/@oracle/suitecloud-cli
+          key: ${{ runner.os }}-suitecloud-v1
+          restore-keys: |
+            ${{ runner.os }}-suitecloud-
+
+      - name: Install SuiteCloud CLI
+        if: steps.cache-suitecloud.outputs.cache-hit != 'true'
+        run: npm install -g --acceptSuiteCloudSDKLicense @oracle/suitecloud-cli
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
+        env:
+          NODE_ENV: development
+
+      - name: Cache Java
+        id: cache-java
+        uses: actions/cache@v4
+        with:
+          path: /opt/hostedtoolcache/Java_Oracle_jdk
+          key: ${{ runner.os }}-java-${{ hashFiles('**/.java-version') }}
+          restore-keys: |
+            ${{ runner.os }}-java-
+
+      - name: Set up Java
+        if: steps.cache-java.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: "oracle"
+          java-version: "17.0.6"
+          java-package: jdk
+
+    outputs:
+      setup-complete: ${{ steps.cache-suitecloud.outputs.cache-hit && steps.cache-java.outputs.cache-hit }}
+
+  test:
+    needs: setup
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+          cache: "npm"
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
+        env:
+          NODE_ENV: development
+
+      - name: Run linting and tests
+        run: npm test
+        continue-on-error: false
+
+    outputs:
+      test-status: ${{ job.status }}
+
+  validate-and-deploy:
+    needs: [setup, test]
+    if: needs.test.outputs.test-status == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        environment: ${{ github.ref_name == 'production' && fromJSON('["production"]') || fromJSON('["sandbox"]') }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "16"
+          cache: "npm"
+
+      - name: Restore SuiteCloud CLI cache
+        id: cache-suitecloud
+        uses: actions/cache@v4
+        with:
+          path: /opt/hostedtoolcache/node/16.20.2/x64/lib/node_modules/@oracle/suitecloud-cli
+          key: ${{ runner.os }}-suitecloud-v1
+          restore-keys: |
+            ${{ runner.os }}-suitecloud-
+
+      - name: Install SuiteCloud CLI
+        run: npm install -g --acceptSuiteCloudSDKLicense @oracle/suitecloud-cli
+
+      - name: Verify SuiteCloud CLI Installation
+        run: |
+          echo "/opt/hostedtoolcache/node/16.20.2/x64/bin" >> $GITHUB_PATH
+          suitecloud --version
+
+      - name: Install npm dependencies
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
+        env:
+          NODE_ENV: development
+
+      - name: Restore Java cache
+        id: cache-java
+        uses: actions/cache@v4
+        with:
+          path: /opt/hostedtoolcache/Java_Oracle_jdk
+          key: ${{ runner.os }}-java-${{ hashFiles('**/.java-version') }}
+
+      - name: Set up Java
+        if: steps.cache-java.outputs.cache-hit != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: "oracle"
+          java-version: "17.0.6"
+          java-package: jdk
+
+      - name: Verify SuiteCloud
+        run: |
+          echo "SUITECLOUD_CI_PASSKEY=${{ secrets.NTST_SUITECLOUD_CI_PASSKEY }}" >> $GITHUB_ENV
+          suitecloud --version
+
+      - name: Create Private Key File
+        working-directory: ./src
+        run: |
+          echo "${{ secrets.USER_PRIVATE_KEY }}" > UserPrivateKey-key.pem
+          chmod 600 UserPrivateKey-key.pem
+        shell: bash
+
+      - name: SuiteCloud account:setup:ci
+        shell: bash
+        working-directory: ./src
+        env:
+          ACCOUNT_ID: ${{ matrix.environment == 'production' && secrets.ACCOUNT_ID || secrets.SB1_ACCOUNT_ID }}
+          CERTIFICATE_ID: ${{ secrets.CERTIFICATE_ID }}
+          DOMAIN: ${{ matrix.environment == 'production' && secrets.PRD_DOMAIN || secrets.SB_DOMAIN }}
+          PRIVATE_KEY: ./UserPrivateKey-key.pem
+          SUITECLOUD_SKIP_CONFIG: true
+          AUTH_ID: ${{ matrix.environment == 'production' && 'Deployment-Production' || 'Deployment-Sandbox' }}
+        run: |
+          echo "ACCOUNT_ID: $ACCOUNT_ID"
+          export SUITECLOUD_CI_PASSKEY=$SUITECLOUD_CI_PASSKEY
+          suitecloud account:setup:ci --account $ACCOUNT_ID --authid $AUTH_ID --certificateid $CERTIFICATE_ID --domain $DOMAIN --privatekeypath $PRIVATE_KEY
+
+      - name: Deploy Project
+        working-directory: ./src
+        env:
+          SUITECLOUD_SKIP_CONFIG: true
+        run: |
+          export SUITECLOUD_CI=1
+          export SUITECLOUD_CI_PASSKEY=$SUITECLOUD_CI_PASSKEY
+          suitecloud project:deploy --accountspecificvalues WARNING
