@@ -694,6 +694,6 @@ node --version  # Should show v20.x.x
 
 **NetSuite SuiteScript Demo Project**
 
-*A simple starting point for NetSuite SuiteApp development*
+**Made with ❤️ by the Avera Engineering Team**
 
 </div>
