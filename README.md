@@ -15,7 +15,6 @@
 - [🛠️ Development Setup](#️-development-setup)
 - [📝 SuiteScript Naming Conventions](#-suitescript-naming-conventions)
 - [🔧 SuiteCloud Extension Setup](#-suitecloud-extension-setup)
-- [🚀 Getting Started](#-getting-started)
 - [🧪 Testing](#-testing)
 - [🔒 Security & Authentication](#-security--authentication)
 - [📦 Deployment](#-deployment)
@@ -186,7 +185,7 @@ Ensure you have the following installed:
 # Java Development Kit (JDK) 17 or higher
 java --version
 
-# Node.js 16.x or higher
+# Node.js 20.x or higher
 node --version
 
 # Visual Studio Code 1.60.0 or higher
@@ -324,20 +323,6 @@ Best for development and testing environments:
    - Account Customization Project (ACP)
    - SuiteApp
 
-#### Project Structure
-
-```
-your-project/
-├── src/                          # Source files
-│   ├── FileCabinet/             # File Cabinet structure
-│   │   └── SuiteScripts/        # Your SuiteScript files
-│   └── Objects/                 # NetSuite objects (records, fields, etc.)
-├── .vscode/                     # VS Code settings
-├── suitecloud.config.js         # SuiteCloud configuration
-├── jest.config.js               # Testing configuration
-└── package.json                 # Node.js dependencies
-```
-
 #### Available Commands
 
 | Command                            | Description                               |
@@ -350,42 +335,6 @@ your-project/
 | `SuiteCloud: Validate Project`     | Validate project structure and syntax     |
 | `SuiteCloud: Run Tests`            | Execute unit tests                        |
 
-### 🧪 Testing Integration
-
-The extension includes integrated testing capabilities:
-
-#### Test Configuration
-
-The project automatically configures Jest for SuiteScript testing:
-
-```javascript
-// jest.config.js
-const SuiteCloudJestConfiguration = require("@oracle/suitecloud-unit-testing/jest-configuration/SuiteCloudJestConfiguration");
-
-module.exports = SuiteCloudJestConfiguration.build({
-  projectFolder: "src",
-  projectType: SuiteCloudJestConfiguration.ProjectType.ACP,
-});
-```
-
-#### Running Tests
-
-1. **From Command Palette**
-
-   ```
-   SuiteCloud: Run Tests
-   ```
-
-2. **From Terminal**
-
-   ```bash
-   npm test
-   ```
-
-3. **With Coverage**
-   ```bash
-   npm run test:coverage
-   ```
 
 ### 🔍 Debugging and Troubleshooting
 
@@ -426,70 +375,6 @@ export SUITECLOUD_LOG_LEVEL=debug
 - **[SuiteScript 2.x API Reference](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/set_1502135122.html)**
 - **[NetSuite Developer Portal](https://developers.netsuite.com/)**
 - **[SuiteCloud CLI Commands](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/bridgehead_4702656043.html)**
-
-## 🚀 Getting Started
-
-### 🔐 Setting Up Authentication
-
-#### Method 1: Certificate-Based Authentication (Recommended)
-
-1. **Generate Certificate Pair**
-
-   ```bash
-   openssl req -x509 -newkey rsa:4096 -sha256 -keyout private-key.pem -out public-cert.pem -nodes -days 730
-   ```
-
-2. **Upload Certificate to NetSuite**
-
-   Navigate to: `Setup → Integration → Manage Authentication → OAuth 2.0 Client Credentials (M2M) Setup`
-
-   - Click "Create New"
-   - Upload your public certificate (`public-cert.pem`)
-   - Map to appropriate entity, role, and application
-
-3. **Configure Application Integration**
-
-#### Method 2: Browser-Based Authentication
-
-Suitable for development environments with less strict security requirements.
-
-### 🔧 Configure Your Account
-
-1. **Open Command Palette** (`Ctrl+Shift+P` / `Cmd+Shift+P`)
-2. **Run:** `SuiteCloud: Set Up Account`
-3. **Choose Authentication Method:**
-   - Select "Machine-to-machine authentication" for production
-   - Select "Browser-based authentication" for development
-4. **Enter Required Information:**
-   - Authentication ID
-   - Account ID (for M2M)
-   - Certificate ID (for M2M)
-   - Private key file path (for M2M)
-
-### 📁 Project Configuration
-
-#### 📋 Configuration Files Overview
-
-```
-├── suitecloud.config.js       # SuiteCloud SDK configuration
-├── jest.config.js             # Jest testing configuration  
-├── jsconfig.json              # JavaScript configuration for IDE
-├── package.json               # Node.js dependencies
-└── manifest.xml               # SuiteApp manifest and metadata
-```
-
-**Getting Started:**
-
-1. **Configure SuiteCloud account** (for deployment)
-
-   ```bash
-   suitecloud account:setup
-   ```
-
-2. **Validate project structure**
-   ```bash
-   suitecloud project:validate
-   ```
 
 ## 🧪 Testing
 
