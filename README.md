@@ -498,39 +498,339 @@ Refer to the [SuiteCloud Extension Setup](#-suitecloud-extension-setup) section 
 - Use environment-specific configurations for different NetSuite accounts
 - Follow principle of least privilege for role assignments
 
-## 📦 Deployment
+## 📦 Deployment Workflow
 
-### 🚀 Manual Deployment
+This section provides a comprehensive guide to deploying your NetSuite SuiteScript project from development to production environments.
 
-To deploy this SuiteApp to your NetSuite environment:
+### 🔄 Deployment Process Overview
 
-1. **Configure Authentication**
-   
-   Set up your NetSuite account authentication using the SuiteCloud CLI:
-   ```bash
-   suitecloud account:setup
-   ```
+```mermaid
+graph TD
+    A[💻 Local Development] --> B[🧪 Run Tests]
+    B --> C{✅ Tests Pass?}
+    C -->|❌ No| A
+    C -->|✅ Yes| D[🔧 Project Validation]
+    D --> E{📋 Valid?}
+    E -->|❌ No| F[🔍 Fix Issues]
+    F --> D
+    E -->|✅ Yes| G[🔐 Authentication Setup]
+    G --> H[🎯 Environment Selection]
+    H --> I[📤 Deploy to NetSuite]
+    I --> J{🚀 Deploy Success?}
+    J -->|❌ No| K[🛠️ Troubleshoot]
+    K --> I
+    J -->|✅ Yes| L[✅ Deployment Complete]
+    L --> M[🔍 Verify in NetSuite]
+```
 
-2. **Validate Project**
-   
-   Ensure your project structure and scripts are valid:
-   ```bash
-   suitecloud project:validate
-   ```
+### 🏗️ Environment Architecture
 
-3. **Deploy to NetSuite**
-   
-   Deploy the SuiteApp to your configured NetSuite account:
-   ```bash
-   suitecloud project:deploy
-   ```
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Development Workflow                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  📁 Local Development    🔄 SuiteCloud CLI    🌐 NetSuite   │
+│  ┌─────────────────┐    ┌─────────────────┐   ┌─────────────┐ │
+│  │  • Code Editor  │ ──▶│  • Validation   │──▶│  • Sandbox  │ │
+│  │  • Unit Tests   │    │  • Authentication│   │  • Account  │ │  
+│  │  • Git Repo    │    │  • Deployment   │   │  • Scripts  │ │
+│  └─────────────────┘    └─────────────────┘   └─────────────┘ │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### 📋 Pre-Deployment Checklist
+### 🔐 Authentication Methods
 
-- [ ] All tests passing (`npm test`)
-- [ ] SuiteCloud CLI authentication configured
-- [ ] Project validation successful
-- [ ] Target NetSuite environment confirmed
+Choose the appropriate authentication method for your deployment:
+
+#### **Method 1: Token-Based Authentication (TBA)** 
+*🔧 Recommended for Development*
+
+```bash
+# Step 1: Create Integration Record in NetSuite
+# Navigate to: Setup → Integration → Manage Integrations → New
+# ✅ Enable "Token-Based Authentication"
+
+# Step 2: Generate Access Token  
+# Navigate to: Setup → Users/Roles → Access Tokens → New
+# 📋 Note: Token ID and Token Secret
+
+# Step 3: Configure SuiteCloud
+suitecloud account:setup
+# Select: "Token-based authentication"
+# Enter: Consumer Key, Consumer Secret, Token ID, Token Secret
+```
+
+#### **Method 2: OAuth 2.0 Certificate Authentication**
+*🔐 Recommended for Production*
+
+```bash
+# Step 1: Generate Certificate Pair
+openssl genrsa -out private-key.pem 2048
+openssl req -new -key private-key.pem -out certificate.csr  
+openssl x509 -req -days 365 -in certificate.csr -signkey private-key.pem -out certificate.pem
+
+# Step 2: Upload to NetSuite
+# Navigate to: Setup → Integration → OAuth 2.0 Client Credentials (M2M) Setup
+# 📤 Upload certificate.pem file
+
+# Step 3: Configure SuiteCloud
+suitecloud account:setup
+# Select: "OAuth 2.0"
+# Provide: Certificate ID, Private Key Path
+```
+
+#### **Method 3: Browser-Based Authentication** 
+*🚀 Quick Setup for Testing*
+
+```bash
+# One-command setup for development
+suitecloud account:setup
+# Select: "Browser-based authentication" 
+# 🌐 Follow browser authentication flow
+```
+
+### 📋 Step-by-Step Deployment Process
+
+#### **Phase 1: Pre-Deployment Preparation**
+
+```bash
+# 1️⃣ Verify Node.js and Dependencies
+node --version          # Should show v20.x.x
+npm --version          # Verify npm is available
+npm install            # Install project dependencies
+
+# 2️⃣ Run Comprehensive Tests
+npm test               # All tests must pass
+# Expected: ✅ 6 test suites, 30 tests passed
+
+# 3️⃣ Install SuiteCloud CLI (if not installed)
+npm install -g @oracle/suitecloud-cli
+suitecloud --version   # Verify installation
+```
+
+#### **Phase 2: Authentication & Configuration**
+
+```bash
+# 4️⃣ Configure NetSuite Account Authentication
+suitecloud account:setup
+
+# You'll be prompted to choose:
+# ┌─────────────────────────────────────────┐
+# │ Select Authentication Method:           │
+# │ 1) Token-based authentication          │
+# │ 2) OAuth 2.0 certificate               │  
+# │ 3) Browser-based authentication        │
+# └─────────────────────────────────────────┘
+
+# 5️⃣ Verify Authentication
+suitecloud account:manage
+# Should list your configured accounts
+```
+
+#### **Phase 3: Project Validation**
+
+```bash
+# 6️⃣ Validate Project Structure
+suitecloud project:validate
+
+# Expected Output:
+# ✅ Project validation completed successfully
+# ✅ No SuiteScript syntax errors found  
+# ✅ No missing dependencies detected
+# ✅ Manifest file is valid
+
+# 7️⃣ Review Validation Results
+# If validation fails:
+# ❌ Review error messages
+# 🔧 Fix identified issues
+# 🔄 Re-run validation
+```
+
+#### **Phase 4: Deployment Execution**
+
+```bash
+# 8️⃣ Deploy to NetSuite
+suitecloud project:deploy
+
+# Deployment Process Flow:
+# 🔄 Authenticating with NetSuite...
+# 📤 Uploading SuiteScript files...
+# 🔧 Installing NetSuite objects...
+# ✅ Deployment completed successfully!
+
+# 9️⃣ Monitor Deployment Progress
+# Watch for:
+# • File upload progress
+# • Object creation status  
+# • Any warning or error messages
+```
+
+#### **Phase 5: Post-Deployment Verification**
+
+```bash
+# 🔍 Verify Deployment in NetSuite
+# 1. Login to NetSuite account
+# 2. Navigate to: Customization → SuiteScript → Scripts
+# 3. Confirm HelloWorld Suitelet is installed
+# 4. Test script functionality
+
+# 🧪 Run Post-Deployment Tests (Optional)
+# Create integration tests to verify deployment
+```
+
+### 🎯 Environment-Specific Deployment
+
+#### **Sandbox Environment**
+```bash
+# Configure for Sandbox
+suitecloud account:setup
+# Enter Sandbox Account ID: SB1_XXXXXXX
+
+# Deploy with specific account
+suitecloud project:deploy --accountid SB1_XXXXXXX
+```
+
+#### **Production Environment**  
+```bash
+# Configure for Production
+suitecloud account:setup  
+# Enter Production Account ID: XXXXXXX_SB2
+
+# Deploy with extra validation
+suitecloud project:deploy --accountid XXXXXXX_SB2 --validate
+```
+
+### 🚨 Error Handling & Troubleshooting
+
+#### **Common Deployment Issues**
+
+<details>
+<summary><strong>🔑 Authentication Failures</strong></summary>
+
+**Error:** `INVALID_LOGIN_CREDENTIALS`
+
+**Solutions:**
+```bash
+# 1. Verify credentials
+suitecloud account:manage
+
+# 2. Re-authenticate
+suitecloud account:setup
+
+# 3. Check account permissions
+# Ensure user has required roles:
+# • Administrator OR SuiteApp Developer
+# • SuiteScript Developer (minimum)
+```
+</details>
+
+<details>
+<summary><strong>📝 Script Validation Errors</strong></summary>
+
+**Error:** `INVALID_SCRIPT_ID` or `SYNTAX_ERROR`
+
+**Solutions:**
+```bash
+# 1. Check SuiteScript syntax
+suitecloud project:validate
+
+# 2. Verify naming conventions
+# Internal IDs: customscript_jnm_description_abbr
+# File names: match manifest.xml entries
+
+# 3. Review dependencies
+# Ensure all @NModule dependencies are available
+```
+</details>
+
+<details>
+<summary><strong>🔧 CLI Configuration Issues</strong></summary>
+
+**Error:** `Command 'suitecloud' not found`
+
+**Solutions:**
+```bash
+# 1. Reinstall SuiteCloud CLI globally
+npm uninstall -g @oracle/suitecloud-cli
+npm install -g @oracle/suitecloud-cli
+
+# 2. Verify PATH environment
+echo $PATH | grep npm
+
+# 3. Use npx as alternative
+npx @oracle/suitecloud-cli project:deploy
+```
+</details>
+
+### ✅ Deployment Checklist
+
+**Pre-Deployment:**
+- [ ] 🧪 All unit tests passing (`npm test`)
+- [ ] 🔧 Project validation successful (`suitecloud project:validate`)  
+- [ ] 🔐 Authentication configured and tested
+- [ ] 🎯 Target environment confirmed (Sandbox/Production)
+- [ ] 📋 All required NetSuite permissions verified
+- [ ] 💾 Local changes committed to version control
+
+**During Deployment:**
+- [ ] 📤 Monitor file upload progress
+- [ ] 👀 Watch for error/warning messages
+- [ ] ⏱️ Note deployment completion time
+- [ ] 📝 Document any deployment issues
+
+**Post-Deployment:**
+- [ ] 🔍 Verify scripts appear in NetSuite UI
+- [ ] 🧪 Test HelloWorld Suitelet functionality
+- [ ] 📊 Check NetSuite system logs for errors
+- [ ] 📝 Update deployment documentation
+- [ ] 👥 Notify team of successful deployment
+
+### 🔄 Rollback Procedures
+
+If deployment issues occur:
+
+```bash
+# Option 1: Quick Rollback (if previous deployment exists)
+suitecloud project:deploy --restore-previous
+
+# Option 2: Manual Object Deletion
+# 1. Navigate to NetSuite → Customization → Scripts
+# 2. Manually delete problematic objects
+# 3. Re-deploy corrected version
+
+# Option 3: Version Control Rollback
+git checkout previous-working-version
+suitecloud project:deploy
+```
+
+### 🚀 Advanced Deployment Options
+
+```bash
+# Deploy with specific validation level
+suitecloud project:deploy --validate=ERROR
+
+# Deploy to specific environment
+suitecloud project:deploy --authid my-production-auth
+
+# Deploy with account-specific values
+suitecloud project:deploy --accountspecificvalues WARNING
+
+# Deployment with logging
+suitecloud project:deploy --log DEBUG
+```
+
+### 📊 Deployment Best Practices
+
+1. **🔄 Always test in Sandbox first** before production deployment
+2. **📝 Document all customizations** and deployment steps
+3. **🔐 Use certificate authentication** for production environments  
+4. **⚡ Deploy during maintenance windows** to minimize user impact
+5. **📋 Maintain deployment logs** for audit and troubleshooting
+6. **🧪 Implement automated testing** in your deployment pipeline
+7. **💾 Always backup** before major deployments
+8. **👥 Coordinate with team** on deployment schedules
 
 ## 🤝 Contributing
 
