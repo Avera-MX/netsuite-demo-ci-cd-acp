@@ -15,7 +15,7 @@
       <audslctrole></audslctrole>
       <eventtype></eventtype>
       <isdeployed>T</isdeployed>
-      <isonline>F</isonline>
+      <isonline>T</isonline>
       <loglevel>DEBUG</loglevel>
       <runasrole>ADMINISTRATOR</runasrole>
       <status>RELEASED</status>
