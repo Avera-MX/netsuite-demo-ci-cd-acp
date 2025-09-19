@@ -38,6 +38,12 @@ Thumbs.db
 
 # Project config
 project.json
+coverage
+.DS_Store.attr.xml
+.DS_Store
+.demo
+.qodo
+.pem
 .replit
 replit.md
 attached_assets

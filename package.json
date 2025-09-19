@@ -2,7 +2,7 @@
   "name": "suitecloud-project",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest"
+    "test": "jest --verbose --coverage"
   },
   "devDependencies": {
     "@oracle/suitecloud-unit-testing": "^1.7.0",
