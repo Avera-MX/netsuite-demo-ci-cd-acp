@@ -1,0 +1,66 @@
+[pr_description]
+extra_instructions = """\
+For the title, use the format [type]: [summary]
+"""
+generate_ai_title = true
+
+[pr_reviewer]
+extra_instructions = """\
+In the `possible issues` section, emphasize the following:
+- Is the code logic efficient?
+- Is there a potential security issue?
+- Hardcoded Sensitive Data
+- Code Duplication
+- Inconsistent Coding Standards
+"""
+require_score_review = true
+require_can_be_split_review = true
+num_code_suggestions = "5"
+
+[pr_code_suggestions]
+extra_instructions = """\
+Emphasize the following:
+
+Does the code logic cover relevant edge cases?
+Is the code logic clear and easy to understand?
+Is the code logic efficient?
+Does the code adhere to the project's coding standards and conventions?
+Is the code well-documented and commented where necessary?
+Are there sufficient unit tests, and do they cover critical functionality?
+Does the code follow security best practices?
+Is the code maintainable and modular?
+Does the code handle errors gracefully?
+Are there any unnecessary dependencies or overly complex solutions?
+Does the code align with the requirements or intended functionality?
+Are there any performance bottlenecks or resource leaks?
+"""
+num_code_suggestions_per_chunk = "5"
+commitable_code_suggestions = true
+suggestions_score_threshold = "2"
+
+[pr_add_docs]
+docs_style = "google style guides"
+
+[checks]
+enable_auto_checks_feedback = true
+persistent_comment = true
+
+[config]
+ignore_pr_target_branches = ["production", "main"]
+allow_only_specific_folders = ["src/FileCabinet"]
+[ignore]
+glob = ["**/*.xml", "*.xml"]
+
+[pr_compliance]
+extra_instructions="""\
+Focus on the following security aspects:
+- Check for exposed API keys, passwords, or secrets
+- Validate proper error handling for external API calls
+- Ensure sensitive data is not logged or exposed
+-
+"""
+enable_security_compliance=true
+enable_estimate_effort_to_review=true
+enable_ticket_labels=false
+enable_todo_scan=true
+persistent_comment=true
