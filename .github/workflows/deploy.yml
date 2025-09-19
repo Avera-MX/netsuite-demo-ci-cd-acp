@@ -180,4 +180,4 @@ jobs:
         run: |
           export SUITECLOUD_CI=1
           export SUITECLOUD_CI_PASSKEY=$SUITECLOUD_CI_PASSKEY
-          suitecloud project:deploy --accountspecificvalues WARNING
+          suitecloud project:deploy --applyinstallprefs -v
