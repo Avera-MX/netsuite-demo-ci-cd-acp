@@ -12,8 +12,7 @@
 
 | Environment    | Status                                                                                                                                       |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Production** | ![Production Workflow Status](https://github.com/Avera-MX/netsuite-suitescript-acp/actions/workflows/deploy.yml/badge.svg?branch=production) |
-| **Sandbox**    | ![Sandbox Workflow Status](https://github.com/Avera-MX/netsuite-suitescript-acp/actions/workflows/deploy.yml/badge.svg?branch=sandbox)       |
+| **Sandbox**    | [![NetSuite CI/CD](https://github.com/Avera-MX/netsuite-demo-ci-cd-acp/actions/workflows/deploy.yml/badge.svg?branch=sandbox)](https://github.com/Avera-MX/netsuite-demo-ci-cd-acp/actions/workflows/deploy.yml) |
 
 ## 📋 Table of Contents
 
