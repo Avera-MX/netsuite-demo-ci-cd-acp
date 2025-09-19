@@ -1,18 +1,12 @@
-# 🚀 NetSuite SuiteScript Account Customization Project
+# 🚀 NetSuite SuiteScript Demo Project
 
 <div align="center">
 
 ![NetSuite](https://img.shields.io/badge/NetSuite-SuiteScript-orange?style=for-the-badge&logo=oracle)
-![Node.js](https://img.shields.io/badge/Node.js-16.x-green?style=for-the-badge&logo=node.js)
+![Node.js](https://img.shields.io/badge/Node.js-20.x-green?style=for-the-badge&logo=node.js)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-yellow?style=for-the-badge&logo=javascript)
 
 </div>
-
-## 🔄 Workflow Status
-
-| Environment    | Status                                                                                                                                       |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Sandbox**    | [![NetSuite CI/CD](https://github.com/Avera-MX/netsuite-demo-ci-cd-acp/actions/workflows/deploy.yml/badge.svg?branch=sandbox)](https://github.com/Avera-MX/netsuite-demo-ci-cd-acp/actions/workflows/deploy.yml) |
 
 ## 📋 Table of Contents
 
@@ -29,40 +23,36 @@
 
 ## 🎯 Overview
 
-This repository contains comprehensive SuiteScript customizations for NetSuite account management, designed to enhance functionality, maintain scalability, and streamline business processes. The project includes various script types including User Events, Client Scripts, Suitelets, Restlets, and Map/Reduce scripts.
+This repository contains a simple NetSuite SuiteApp demo project built with SuiteScript 2.1. It serves as a starting point for NetSuite development, featuring a basic Suitelet example and comprehensive testing setup using Jest.
 
 ### ✨ Key Features
 
-- 🔄 **Automated CI/CD Pipeline** - Continuous integration and deployment to Sandbox and Production environments
-- 📊 **Advanced Reporting** - Custom reporting solutions with enhanced analytics
-- 🛒 **Marketplace Integrations** - Support for multiple e-commerce platforms (Amazon, Liverpool, Walmart, etc.)
-- 📦 **Inventory Management** - Comprehensive inventory tracking and management tools
-- 🧾 **Document Management** - Automated invoice processing and document generation
-- 🔍 **Monitoring & Logging** - Real-time monitoring and error tracking capabilities
+- 📝 **Hello World Suitelet** - Basic Suitelet demonstrating form creation and HTML rendering
+- 🧪 **Jest Testing Framework** - Complete test setup with SuiteCloud unit testing utilities
+- 🏗️ **SuiteApp Structure** - Proper SuiteApp organization under `com.netsuite.averademo` namespace
+- 🔧 **Development Ready** - Pre-configured for immediate NetSuite development
 
 ## 🏗️ Project Structure
 
 ```
 ├── src/                          # Source code directory
 │   ├── FileCabinet/             # NetSuite File Cabinet structure
-│   │   └── SuiteScripts/        # All SuiteScript files
-│   │       ├── Jinim/           # Main organization folder
-│   │       │   ├── Suitescript_2.x/  # SuiteScript 2.x implementations
-│   │       │   │   ├── Common/       # Shared utilities and libraries
-│   │       │   │   ├── Process/      # Background processing scripts
-│   │       │   │   └── Services/     # API and service scripts
-│   │       │   └── Suitescript_1.0/  # Legacy SuiteScript 1.0 (deprecated)
-│   │       ├── Client/          # Client-side scripts
-│   │       ├── UserEvent/       # Server-side event scripts
-│   │       ├── Suitelet/        # Web interface scripts
-│   │       ├── MapReduce/       # Batch processing scripts
-│   │       └── Restlet/         # API endpoint scripts
+│   │   └── SuiteApps/           # SuiteApp namespace structure
+│   │       └── com.netsuite.averademo/  # Demo SuiteApp namespace
+│   │           ├── common/       # Common utilities (placeholder)
+│   │           ├── process/      # Process scripts (placeholder)
+│   │           └── services/     # Service layer scripts
+│   │               ├── restlet/  # RESTlet scripts (placeholder)
+│   │               └── suitelet/ # Suitelet scripts
+│   │                   └── HelloWorld.Suitelet.js  # Demo Suitelet
+│   ├── InstallationPreferences/ # SuiteApp installation preferences
 │   └── Objects/                 # NetSuite configuration objects
-│       ├── CustomRecords/       # Custom record definitions
-│       ├── SavedSearches/       # Saved search configurations
-│       └── ...                  # Other NetSuite objects
-├── __test__/                    # Test files and specifications
-├── .github/workflows/           # GitHub Actions CI/CD workflows
+│       └── customscript_jnm_helloworld_st.xml  # Hello World script record
+├── __tests__/                   # Test files and specifications
+│   └── sample-test.js           # Example Jest tests with NetSuite mocks
+├── jest.config.js               # Jest configuration for SuiteScript testing
+├── suitecloud.config.js         # SuiteCloud SDK configuration
+├── jsconfig.json               # JavaScript/TypeScript configuration
 └── package.json                 # Node.js dependencies and scripts
 ```
 
@@ -73,7 +63,7 @@ This repository contains comprehensive SuiteScript customizations for NetSuite a
 Before you begin, ensure you have the following installed:
 
 - **Oracle JDK 17** - Required for SuiteCloud SDK
-- **Node.js 16.x** - JavaScript runtime
+- **Node.js 20.x** - JavaScript runtime
 - **Visual Studio Code 1.91.1+** - Recommended IDE
 - **Git** - Version control
 
@@ -82,8 +72,8 @@ Before you begin, ensure you have the following installed:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/Avera-MX/netsuite-suitescript-acp.git
-   cd netsuite-suitescript-acp
+   git clone <your-repo-url>
+   cd <your-project-name>
    ```
 
 2. **Install dependencies**
@@ -102,6 +92,14 @@ Before you begin, ensure you have the following installed:
    ```bash
    npm test
    ```
+
+### What's Included
+
+This demo project includes:
+
+- **HelloWorld Suitelet** - A basic Suitelet that renders a styled "Hello World" form
+- **Sample Tests** - Jest tests demonstrating NetSuite module mocking and testing patterns
+- **SuiteCloud Configuration** - Pre-configured for SuiteApp development and deployment
 
 ## 📝 SuiteScript Naming Conventions
 
@@ -470,156 +468,120 @@ Suitable for development environments with less strict security requirements.
 
 ### 📁 Project Configuration
 
-#### 🔧 Environment Variables Setup
-
-This project uses environment variables for secure configuration management. Set up the following environment variables in your system or create a `.env` file:
-
-**Required Environment Variables:**
-
-- `ACCOUNT_ID` - Your NetSuite Production Account ID
-- `SB1_ACCOUNT_ID` - Your NetSuite Sandbox Account ID
-- `CERTIFICATE_ID` - OAuth Certificate ID
-- `JINIMTECHUSER_KEY` - Private key content (paste the entire PEM file content)
-- `PRD_DOMAIN` / `SB_DOMAIN` - Environment domains
-
 #### 📋 Configuration Files Overview
 
 ```
 ├── suitecloud.config.js       # SuiteCloud SDK configuration
-├── jest.config.js             # Testing configuration
-├── jsconfig.json              # JavaScript configuration
+├── jest.config.js             # Jest testing configuration  
+├── jsconfig.json              # JavaScript configuration for IDE
 ├── package.json               # Node.js dependencies
-└── .gitignore                 # Git ignore patterns
+└── manifest.xml               # SuiteApp manifest and metadata
 ```
 
-**Setting up locally:**
+**Getting Started:**
 
-1. **Create environment file** (optional)
-
-   ```bash
-   cp .env.example .env
-   # Edit .env with your credentials
-   ```
-
-2. **Configure SuiteCloud account**
+1. **Configure SuiteCloud account** (for deployment)
 
    ```bash
    suitecloud account:setup
    ```
 
-3. **Validate project**
+2. **Validate project structure**
    ```bash
    suitecloud project:validate
    ```
 
 ## 🧪 Testing
 
-We use Jest for unit testing with comprehensive coverage reporting.
+We use Jest for unit testing with SuiteCloud's testing framework for NetSuite module mocking.
 
 ### Running Tests
 
 ```bash
 # Run all tests
 npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run specific test file
-npm test -- __test__/specific-test.spec.js
 ```
 
 ### Test Structure
 
-- `__test__/` - Main test directory
-- `__test__/constants-test/` - Tests for utility constants
-- `__test__/utility-test/` - Tests for utility functions
-- Individual test files for specific modules
+- `__tests__/` - Main test directory
+- `sample-test.js` - Example tests demonstrating basic assertions and NetSuite record mocking
 
 ### Writing Tests
 
 Follow the existing patterns in the test files. Example test structure:
 
 ```javascript
-// Mock dependencies
-jest.mock("N/log");
-const mockModule = require("../src/path/to/module");
+import record from 'N/record';
+import Record from 'N/record/instance';
+
+jest.mock('N/record');
+jest.mock('N/record/instance');
 
 describe("Module Name", () => {
   test("should perform expected behavior", () => {
-    // Test implementation
+    // Test implementation with mocked NetSuite modules
   });
 });
 ```
 
+### Sample Test Examples
+
+The project includes two types of tests:
+1. **Basic String Assertion** - Simple Jest functionality test
+2. **NetSuite Record Mock Test** - Demonstrates mocking N/record modules for SuiteScript testing
+
 ## 🔒 Security & Authentication
 
-### 🔑 Environment Variables
+### 🔑 Authentication Setup
 
-Sensitive information is managed through environment variables or GitHub Secrets:
+For deployment to NetSuite environments, you'll need to configure authentication using one of these methods:
 
-- `ACCOUNT_ID` / `SB1_ACCOUNT_ID` - NetSuite account identifiers
-- `CERTIFICATE_ID` - OAuth certificate ID
-- `JINIMTECHUSER_KEY` - Private key for authentication
-- `PRD_DOMAIN` / `SB_DOMAIN` - Environment domains
-- `NTST_SUITECLOUD_CI_PASSKEY` - CI/CD passkey
+- **Token-Based Authentication (TBA)** - Recommended for production environments
+- **OAuth 2.0 Certificate Authentication** - For secure machine-to-machine authentication  
+- **Browser-Based Authentication** - Suitable for development and testing
+
+Refer to the [SuiteCloud Extension Setup](#-suitecloud-extension-setup) section for detailed authentication configuration steps.
 
 ### 🛡️ Best Practices
 
 - Never commit sensitive information to the repository
-- Use environment-specific configurations
-- Regularly rotate certificates and keys
+- Use environment-specific configurations for different NetSuite accounts
 - Follow principle of least privilege for role assignments
 
 ## 📦 Deployment
 
-### 🔄 Automated Deployment
-
-The project uses GitHub Actions for automated deployment with a comprehensive CI/CD pipeline:
-
-**Workflow Overview:**
-
-```mermaid
-graph TD
-    A[Push to Branch] --> B{Branch Check}
-    B -->|sandbox| C[Sandbox Deployment]
-    B -->|production| D[Production Deployment]
-    C --> E[Run Tests]
-    D --> E[Run Tests]
-    E --> F[SuiteCloud Validation]
-    F --> G[Deploy to NetSuite]
-    G --> H[Deployment Complete]
-```
-
-**Deployment Triggers:**
-
-- **Sandbox Deployment** - Triggered on pushes to `sandbox` branch
-- **Production Deployment** - Triggered on pushes to `production` branch
-- **Pull Request Validation** - Runs tests and validation on PRs
-
-![GitHub Actions Workflow](https://docs.github.com/assets/images/help/repository/actions-tab.png)
-
-_GitHub Actions workflow status in repository_
-
 ### 🚀 Manual Deployment
 
-For manual deployments using SuiteCloud CLI:
+To deploy this SuiteApp to your NetSuite environment:
 
-```bash
-# Deploy to configured account
-suitecloud project:deploy --accountspecificvalues WARNING
+1. **Configure Authentication**
+   
+   Set up your NetSuite account authentication using the SuiteCloud CLI:
+   ```bash
+   suitecloud account:setup
+   ```
 
-# Deploy with specific authentication
-suitecloud project:deploy --authid YOUR_AUTH_ID
-```
+2. **Validate Project**
+   
+   Ensure your project structure and scripts are valid:
+   ```bash
+   suitecloud project:validate
+   ```
 
-### 📋 Deployment Checklist
+3. **Deploy to NetSuite**
+   
+   Deploy the SuiteApp to your configured NetSuite account:
+   ```bash
+   suitecloud project:deploy
+   ```
 
-- [ ] All tests passing
-- [ ] Code review completed
-- [ ] Environment variables configured
-- [ ] Backup created (for production)
-- [ ] Rollback plan prepared
+### 📋 Pre-Deployment Checklist
+
+- [ ] All tests passing (`npm test`)
+- [ ] SuiteCloud CLI authentication configured
+- [ ] Project validation successful
+- [ ] Target NetSuite environment confirmed
 
 ## 🤝 Contributing
 
@@ -674,35 +636,7 @@ Closes #123
 
 ### Common Issues and Solutions
 
-#### 1. Authentication Failures
-
-**Problem:** Certificate authentication fails
-
-```
-Error: INVALID_LOGIN_CREDENTIALS
-```
-
-**Solution:**
-
-1. Verify certificate is correctly uploaded to NetSuite
-2. Check that certificate ID matches in your configuration
-3. Ensure private key file is accessible and properly formatted
-
-#### 2. Deployment Issues
-
-**Problem:** Deployment fails with validation errors
-
-```
-Error: INVALID_SCRIPT_ID
-```
-
-**Solution:**
-
-1. Check SuiteScript naming conventions are followed
-2. Verify all required dependencies are included
-3. Run local validation: `suitecloud project:validate`
-
-#### 3. Environment Setup
+#### 1. SuiteCloud CLI Installation
 
 **Problem:** SuiteCloud CLI not found
 
@@ -711,43 +645,55 @@ Command 'suitecloud' not found
 ```
 
 **Solution:**
-
 ```bash
 npm install -g @oracle/suitecloud-cli
 ```
 
-#### 4. Node.js Version Issues
+#### 2. Node.js Version Issues
 
 **Problem:** Compatibility issues with Node.js
 
+**Solution:** Ensure you're using Node.js 20.x:
+```bash
+node --version  # Should show v20.x.x
 ```
-Error: Unsupported Node.js version
-```
+
+#### 3. Test Failures
+
+**Problem:** Jest tests not running properly
 
 **Solution:**
+1. Verify all dependencies are installed: `npm install`
+2. Check Jest configuration in `jest.config.js`
+3. Ensure NetSuite module mocks are properly configured
 
-1. Install Node.js 16.x using nvm:
-   ```bash
-   nvm install 16
-   nvm use 16
-   ```
+#### 4. Deployment Issues
+
+**Problem:** Deployment fails with validation errors
+
+**Solution:**
+1. Run local validation first: `suitecloud project:validate`
+2. Verify authentication is properly configured: `suitecloud account:setup`
+3. Check that all required dependencies are included
 
 ### 📞 Getting Help
 
 - **NetSuite SuiteCloud Documentation:** [docs.oracle.com/netsuite](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/)
-- **Project Issues:** Create an issue in this repository
 - **SuiteCloud Community:** [NetSuite Developer Community](https://community.oracle.com/netsuite/)
 
 ## 📚 Additional Resources
 
 - [NetSuite SuiteCloud SDK Documentation](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/chapter_156026236161.html)
-- [SuiteScript 2.x API Documentation](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/set_1502135122.html)
-- [SuiteCloud Development Framework](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/section_4702656040.html)
+- [SuiteScript 2.x API Reference](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/set_1502135122.html)
+- [NetSuite Developer Portal](https://developers.netsuite.com/)
+- [SuiteCloud CLI Commands](https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/bridgehead_4702656043.html)
 
 ---
 
 <div align="center">
 
-**Made with ❤️ by the Avera Engineering Team**
+**NetSuite SuiteScript Demo Project**
+
+*A simple starting point for NetSuite SuiteApp development*
 
 </div>
