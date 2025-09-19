@@ -1,0 +1,6 @@
+* @Avera-MX/engineering-team
+/.github/* @Avera-MX/engineering-team
+/src/* @Avera-MX/engineering-team
+/CODEOWNERS @Avera-MX/engineering-team
+.gitignore @Avera-MX/engineering-team
+.pr_agent.toml @Avera-MX/administrators
