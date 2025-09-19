@@ -1,9 +1,6 @@
 <deploy>
-    <configuration>
-        <path>~/AccountConfiguration/*</path>
-    </configuration>
     <files>
-        <path>~/FileCabinet/*</path>
+        <path>~/FileCabinet/SuiteApps/com.netsuite.averademo/*</path>
     </files>
     <objects>
         <path>~/Objects/*</path>

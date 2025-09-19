@@ -1,4 +1,7 @@
-<manifest projecttype="ACCOUNTCUSTOMIZATION">
-  <projectname>netsuite-demo-ci-cd-acp</projectname>
+<manifest projecttype="SUITEAPP">
+  <publisherid>com.netsuite</publisherid>
+  <projectid>averademo</projectid>
+  <projectname>netsuite-demo-ci-cd-suiteapp</projectname>
+  <projectversion>1.0.0</projectversion>
   <frameworkversion>1.0</frameworkversion>
 </manifest>

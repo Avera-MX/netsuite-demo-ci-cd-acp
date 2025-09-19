@@ -3,5 +3,5 @@ const cliConfig = require("./suitecloud.config");
 
 module.exports = SuiteCloudJestConfiguration.build({
 	projectFolder: cliConfig.defaultProjectFolder,
-	projectType: SuiteCloudJestConfiguration.ProjectType.ACP,
+	projectType: SuiteCloudJestConfiguration.ProjectType.SUITEAPP,
 });
