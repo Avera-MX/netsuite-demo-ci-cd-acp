@@ -4,4 +4,10 @@
   <projectname>netsuite-demo-ci-cd-suiteapp</projectname>
   <projectversion>1.0.0</projectversion>
   <frameworkversion>1.0</frameworkversion>
+  <dependencies>
+    <features>
+      <feature required="true">SERVERSIDESCRIPTING</feature>
+      <feature required="false">CRM</feature>
+    </features>
+  </dependencies>
 </manifest>
