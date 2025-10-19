@@ -13,6 +13,14 @@
 - [🎯 Overview](#-overview)
 - [🏗️ Project Structure](#️-project-structure)
 - [🛠️ Development Setup](#️-development-setup)
+- [⚡ Git Hooks Setup](#-git-hooks-setup)
+  - [🎯 Hook Purpose](#-hook-purpose)
+  - [📥 Installation Instructions](#-installation-instructions)
+  - [🔄 Expected Behavior](#-expected-behavior)
+  - [⚙️ How It Works](#️-how-it-works)
+  - [🛡️ Benefits](#️-benefits)
+  - [🔍 Troubleshooting](#-troubleshooting-1)
+  - [📝 Important Notes](#-important-notes)
 - [📝 SuiteScript Naming Conventions](#-suitescript-naming-conventions)
 - [🔧 SuiteCloud Extension Setup](#-suitecloud-extension-setup)
 - [🧪 Testing](#-testing)
@@ -29,7 +37,7 @@
   - [🚀 Advanced Deployment Options](#-advanced-deployment-options)
   - [📊 Deployment Best Practices](#-deployment-best-practices)
 - [🤝 Contributing](#-contributing)
-- [🔧 Troubleshooting](#-troubleshooting)
+- [🔧 Troubleshooting](#-troubleshooting-2)
 - [📚 Additional Resources](#-additional-resources)
 
 ## 🎯 Overview
@@ -111,6 +119,242 @@ This demo project includes:
 - **HelloWorld Suitelet** - A basic Suitelet that renders a styled "Hello World" form
 - **Sample Tests** - Jest tests demonstrating NetSuite module mocking and testing patterns
 - **SuiteCloud Configuration** - Pre-configured for SuiteApp development and deployment
+
+## ⚡ Git Hooks Setup
+
+This project includes a pre-commit hook that automatically manages the deployment configuration, ensuring your `deploy.xml` file stays synchronized with actual object changes.
+
+### 🎯 Hook Purpose
+
+The pre-commit hook automates the management of the `<objects>` section in `src/deploy.xml` file:
+
+- **Automatic Synchronization**: Detects changes in `src/Objects/` directory and updates `deploy.xml` accordingly
+- **Selective Deployment**: Only includes modified NetSuite objects in the deployment manifest
+- **Manual Edit Prevention**: Eliminates the need to manually edit `deploy.xml` for object tracking
+- **Clean State Management**: Removes the `<objects>` block when no objects are modified
+
+### 📥 Installation Instructions
+
+Follow these steps to install the pre-commit hook in your local repository:
+
+#### **Step 1: Make the Hook Executable**
+
+```bash
+chmod +x pre-commit
+```
+
+#### **Step 2: Copy to Git Hooks Directory**
+
+```bash
+cp pre-commit .git/hooks/pre-commit
+```
+
+#### **Step 3: Verify Installation**
+
+```bash
+# Check that the hook exists and is executable
+ls -la .git/hooks/pre-commit
+# Expected output: -rwxr-xr-x ... .git/hooks/pre-commit
+```
+
+#### **Alternative: Automated Installation Script**
+
+You can also create a quick installation script:
+
+```bash
+# Create install-hooks.sh
+cat > install-hooks.sh << 'EOF'
+#!/bin/bash
+echo "🔧 Installing Git hooks..."
+chmod +x pre-commit
+cp pre-commit .git/hooks/pre-commit
+echo "✅ Pre-commit hook installed successfully!"
+EOF
+
+# Make it executable and run
+chmod +x install-hooks.sh
+./install-hooks.sh
+```
+
+### 🔄 Expected Behavior
+
+The pre-commit hook automatically runs before every commit and performs the following actions:
+
+#### **Scenario 1: Objects Modified**
+
+When you stage files in `src/Objects/` directory:
+
+```bash
+# Example workflow
+git add src/Objects/customscript_jnm_example.xml
+git commit -m "feat: add new custom script"
+
+# Hook output:
+# 📝 Changes detected in src/Objects/. Rebuilding <objects> block...
+# 👍 src/deploy.xml has been updated with specific object paths.
+```
+
+**Result**: The hook automatically:
+1. Removes the existing `<objects>` block from `deploy.xml`
+2. Creates a new `<objects>` block containing only staged objects
+3. Updates paths from `src/Objects/...` to `~/Objects/...` format
+4. Stages the modified `deploy.xml` file for commit
+
+**Updated deploy.xml:**
+```xml
+<deploy>
+    <configuration>
+        <preview>true</preview>
+    </configuration>
+    <files/>
+    <objects>
+        <path>~/Objects/customscript_jnm_example.xml</path>
+    </objects>
+</deploy>
+```
+
+#### **Scenario 2: No Objects Modified**
+
+When you commit changes without staging any files from `src/Objects/`:
+
+```bash
+# Example workflow
+git add src/FileCabinet/SuiteApps/com.netsuite.averademo/services/suitelet/MyScript.js
+git commit -m "refactor: improve suitelet logic"
+
+# Hook output:
+# ✅ No changes in src/Objects/. The <objects> block has been removed from src/deploy.xml.
+```
+
+**Result**: The hook automatically:
+1. Removes the entire `<objects>` block from `deploy.xml`
+2. Stages the cleaned `deploy.xml` file for commit
+
+**Updated deploy.xml:**
+```xml
+<deploy>
+    <configuration>
+        <preview>true</preview>
+    </configuration>
+    <files/>
+</deploy>
+```
+
+#### **Scenario 3: Multiple Objects Modified**
+
+When you stage multiple object files:
+
+```bash
+# Example workflow
+git add src/Objects/customscript_jnm_script1.xml
+git add src/Objects/customscript_jnm_script2.xml
+git add src/Objects/customrecord_custom_type.xml
+git commit -m "feat: add multiple custom objects"
+
+# Hook output:
+# 📝 Changes detected in src/Objects/. Rebuilding <objects> block...
+# 👍 src/deploy.xml has been updated with specific object paths.
+```
+
+**Updated deploy.xml:**
+```xml
+<deploy>
+    <configuration>
+        <preview>true</preview>
+    </configuration>
+    <files/>
+    <objects>
+        <path>~/Objects/customscript_jnm_script1.xml</path>
+        <path>~/Objects/customscript_jnm_script2.xml</path>
+        <path>~/Objects/customrecord_custom_type.xml</path>
+    </objects>
+</deploy>
+```
+
+### ⚙️ How It Works
+
+The pre-commit hook performs the following operations:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Pre-Commit Hook Flow                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  1️⃣ Git Commit Triggered                                    │
+│      ↓                                                      │
+│  2️⃣ Hook Executes Automatically                             │
+│      ↓                                                      │
+│  3️⃣ Detect Staged Files in src/Objects/                     │
+│      ├─ Files Found?                                        │
+│      │   ├─ YES → Build <objects> block                    │
+│      │   │         • Extract file paths                    │
+│      │   │         • Convert to ~/Objects/ format          │
+│      │   │         • Create XML structure                  │
+│      │   │         • Insert into deploy.xml                │
+│      │   │                                                 │
+│      │   └─ NO  → Remove <objects> block entirely          │
+│      ↓                                                      │
+│  4️⃣ Stage Modified deploy.xml                               │
+│      ↓                                                      │
+│  5️⃣ Commit Proceeds with Updated Files                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🛡️ Benefits
+
+- **🚀 Automation**: No manual editing of `deploy.xml` required
+- **✅ Accuracy**: Eliminates human error in deployment configuration
+- **⚡ Efficiency**: Saves time by automating repetitive tasks
+- **🎯 Selective Deployment**: Only deploys objects that were actually modified
+- **🔒 Consistency**: Ensures deployment manifest always matches repository state
+- **📋 Clean Commits**: Automatically includes updated `deploy.xml` in commits
+
+### 🔍 Troubleshooting
+
+#### **Hook Not Running**
+
+**Problem**: Pre-commit hook doesn't execute on commit
+
+**Solutions:**
+```bash
+# 1. Verify hook is executable
+chmod +x .git/hooks/pre-commit
+
+# 2. Check hook location
+ls -la .git/hooks/pre-commit
+
+# 3. Ensure no git bypass flags
+# Avoid using: git commit --no-verify
+```
+
+#### **Permission Denied**
+
+**Problem**: `bash: .git/hooks/pre-commit: Permission denied`
+
+**Solution:**
+```bash
+# Make the hook executable
+chmod +x .git/hooks/pre-commit
+```
+
+#### **Hook Not Found**
+
+**Problem**: Hook file doesn't exist in `.git/hooks/`
+
+**Solution:**
+```bash
+# Reinstall the hook
+cp pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+### 📝 Important Notes
+
+- **Git Hooks Are Local**: Each developer must install the hook on their local repository
+- **Not Version Controlled**: The `.git/hooks/` directory is not tracked by Git
+- **Team Onboarding**: Include hook installation in your team's onboarding documentation
+- **Bypass Option**: Use `git commit --no-verify` to skip hook execution (not recommended)
 
 ## 📝 SuiteScript Naming Conventions
 
