@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# --- Configuration ---
+# The file to be modified
+DEPLOY_XML="src/deploy.xml"
+# The folder to watch for changes
+WATCH_FOLDER="src/Objects/"
+# --- End Configuration ---
+
+# A temporary file for safe editing
+TEMP_FILE="${DEPLOY_XML}.tmp"
+
+# Get a list of staged files (Added, Copied, Modified, Renamed) in the target folder
+CHANGED_OBJECTS=$(git diff --cached --name-only --diff-filter=ACMR | grep "^${WATCH_FOLDER}")
+
+# Always remove the old <objects> block to start from a clean state.
+# This works whether we need to remove it permanently or just update it.
+# Using sed's range deletion `/start/,/end/d`.
+sed '/<objects>/,/<\/objects>/d' "$DEPLOY_XML" > "$TEMP_FILE"
+
+# Check if there are any changes to process
+if [ -n "$CHANGED_OBJECTS" ]; then
+    echo "📝 Changes detected in ${WATCH_FOLDER}. Rebuilding <objects> block..."
+
+    # Start building the new <objects> XML block
+    OBJECTS_XML="    <objects>\n"
+
+    # Loop through each changed file and create a <path> tag
+    while IFS= read -r file; do
+        # Correct the path: remove the 'src/' prefix and prepend '~/'
+        corrected_path="~/${file#src/}"
+        OBJECTS_XML+="        <path>${corrected_path}</path>\n"
+    done <<< "$CHANGED_OBJECTS"
+
+    # Close the <objects> block
+    OBJECTS_XML+="    </objects>"
+
+    # Use awk to insert the newly created block right after the </files> closing tag
+    awk -v new_objects="$OBJECTS_XML" '
+      { print }
+      /<\/files>/ {
+        print new_objects
+      }
+    ' "$TEMP_FILE" > "${DEPLOY_XML}.final" && mv "${DEPLOY_XML}.final" "$TEMP_FILE"
+
+    echo "👍 ${DEPLOY_XML} has been updated with specific object paths."
+
+else
+    echo "✅ No changes in ${WATCH_FOLDER}. The <objects> block has been removed from ${DEPLOY_XML}."
+fi
+
+# Overwrite the original deploy.xml with the modified version
+mv "$TEMP_FILE" "$DEPLOY_XML"
+
+# VERY IMPORTANT: Stage the modified deploy.xml so it's included in the commit
+git add "$DEPLOY_XML"
+
+exit 0

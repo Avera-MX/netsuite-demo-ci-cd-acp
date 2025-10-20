@@ -3,6 +3,7 @@ extra_instructions = """\
 For the title, use the format [type]: [summary]
 """
 generate_ai_title = true
+auto_create_ticket = true
 
 [pr_reviewer]
 extra_instructions = """\
@@ -61,6 +62,6 @@ Focus on the following security aspects:
 """
 enable_security_compliance=true
 enable_estimate_effort_to_review=true
-enable_ticket_labels=false
+enable_ticket_labels=true
 enable_todo_scan=true
 persistent_comment=true

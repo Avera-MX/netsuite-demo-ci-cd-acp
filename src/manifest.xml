@@ -2,7 +2,7 @@
   <publisherid>com.netsuite</publisherid>
   <projectid>averademo</projectid>
   <projectname>netsuite-demo-ci-cd-suiteapp</projectname>
-  <projectversion>1.0.0</projectversion>
+  <projectversion>1.0.1</projectversion>
   <frameworkversion>1.0</frameworkversion>
   <dependencies>
     <features>
